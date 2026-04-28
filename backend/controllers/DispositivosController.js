@@ -175,6 +175,83 @@ class DispositivosController {
             })
         }
     }
+
+    static async verificarCracha(req, res) {
+        try {
+            const { id, cracha } = req.params
+
+            const dispositivo = await prisma.dispositivo.findUnique({
+                where: {
+                    id: Number(id)
+                }, select: {
+                    idDepartamento: true
+                }
+            })
+
+            if(!dispositivo) { // verifica se o dispositivo existe, se não existir, retorna que o dispositivo não é cadastrado
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: "Dispositivo não cadastrado"
+                })
+            }
+
+            const usuario = await prisma.tag.findUnique({
+                where: {
+                    codigoTag: cracha
+                }, select: {
+                    idUsuario: true
+                }
+            })
+
+            if (!usuario) { // verifica se o cracha tem um usuario associado, se não tiver, retorna que o cracha não é cadastrado
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: "Cracha não cadastrado"
+                })
+            }
+
+            const departamento = await prisma.funcionario.findFirst({
+                where: {
+                    idUsuario: usuario.idUsuario,
+                },
+                select: {
+                    idDepartamento: true
+                }
+            })
+
+            if(!departamento) { // verifica se o usuario tem um departamento associado, se não tiver, retorna que o usuario não tem departamento
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: "Usuario não tem departamento associado"
+                })
+            }
+
+
+            // console.log(departamento.idDepartamento)
+            // console.log(departamento)
+            // console.log(`id do departamento: ${dispositivo.idDepartamento}, id do usuario: ${usuario.idUsuario}`)
+            if (departamento.idDepartamento != dispositivo.idDepartamento) {
+                return res.status(403).json({
+                    sucesso: false,
+                    mensagem: "Acesso negado: usuário não tem permissão para acessar este dispositivo"
+                })
+            }
+
+
+
+
+            return res.status(200).json({
+                sucesso: true
+            })
+
+        } catch (e) {
+            return res.status(500).json({
+                sucesso: false,
+                mensagem: "Erro ao verificar o crachá",
+                erro: e.message
+            })
+        }
+    }
 }
 
 export default DispositivosController;
