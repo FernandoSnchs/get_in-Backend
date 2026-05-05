@@ -26,6 +26,7 @@ import RequisicaoFuncRouter from './router/RequisicaoFuncRouter.js';
 import DispositivosRouter from './router/DispositivosRouter.js';
 import LogsRouter from './router/LogsRouter.js';
 import RequisicaoVisitanteRouter from './router/RequisicaoVisitanteRouter.js';
+import ViewRouter from './router/ViewRouter.js';
 
 // -------REGISTRO DAS ROTAS------- //
 
@@ -39,6 +40,7 @@ app.use('/requisicao', RequisicaoFuncRouter);
 app.use('/requisicao-visitante', RequisicaoVisitanteRouter);
 app.use('/dispositivos', DispositivosRouter);
 app.use('/logs', LogsRouter);
+app.use('/views', ViewRouter);
 
 
 app.get("/health", (req, res) => {
